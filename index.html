@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¿Quieres salir conmigo?</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos personalizados para animaciones y fuentes */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+            overflow: hidden; /* Evita barras de desplazamiento al mover el botón */
+        }
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        /* Animación suave para el movimiento del botón 'No' */
+        .btn-escapista {
+            transition: all 0.2s ease-out;
+            position: absolute; /* Importante para poder moverlo libremente */
+        }
+
+        /* Animación de latido para el corazón */
+        @keyframes latido {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .corazon {
+            animation: latido 1.5s infinite;
+            display: inline-block;
+        }
+
+        /* Animación para confeti (se añade con JS) */
+        @keyframes caer {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+        .confeti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #ff0a54;
+            animation: caer 3s linear forwards;
+            z-index: 10;
+        }
+
+        /* Animación para la aparición de las tarjetas de opciones */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .fade-in-up {
+            animation: fadeInUp 0.4s ease-out forwards;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center relative">
+
+    <!-- Contenedor principal de la tarjeta -->
+    <div id="tarjeta-principal" class="bg-white/90 backdrop-blur-sm p-8 md:p-12 rounded-3xl shadow-2xl text-center max-w-md w-[90%] relative z-20 border border-white/50">
+        
+        <!-- Elementos decorativos -->
+        <div class="absolute -top-6 -left-6 text-6xl corazon opacity-80">✨</div>
+        <div class="absolute -bottom-6 -right-6 text-6xl corazon opacity-80" style="animation-delay: 0.5s;">💖</div>
+
+        <h1 class="text-4xl md:text-5xl text-pink-600 mb-6 font-bold leading-tight">
+            Hola mi amor... <br>
+            <span class="text-3xl text-gray-700 font-sans font-semibold mt-2 block">¿Quieres salir conmigo hoy?</span>
+        </h1>
+        
+        <p class="text-gray-600 mb-10 text-lg">
+            Te prometo una noche increíble. 😊
+        </p>
+
+        <div class="relative h-24 flex items-center justify-center gap-4" id="contenedor-botones">
+            <!-- Botón SÍ -->
+            <button id="btn-si" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:scale-110 active:scale-95 text-xl z-10">
+                ¡Sí, obvio!
+            </button>
+            
+            <!-- Botón NO -->
+            <button id="btn-no" class="bg-gray-300 hover:bg-gray-400 text-gray-700 font-bold py-3 px-8 rounded-full shadow-md btn-escapista text-xl z-10" style="left: calc(50% + 20px);">
+                No, paso
+            </button>
+        </div>
+    </div>
+
+    <!-- PANTALLA 2: ELECCIÓN DE PLAN -->
+    <div id="pantalla-planes" class="hidden bg-white/90 backdrop-blur-sm p-8 md:p-12 rounded-3xl shadow-2xl text-center max-w-md w-[90%] relative z-20 border border-white/50 fade-in-up">
+        <h2 class="text-3xl md:text-4xl text-pink-600 mb-6 font-bold leading-tight font-sans">
+            ¡Qué emoción! 🎉<br>
+            <span class="text-2xl text-gray-700 mt-2 block">¿Qué plan te gustaría hacer?</span>
+        </h2>
+        <div class="flex flex-col gap-4">
+            <button onclick="elegirPlan('Cena')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 font-bold py-4 px-6 rounded-2xl shadow transition transform hover:scale-105 active:scale-95 text-xl flex items-center justify-center gap-3">🍽️ Una cena romántica</button>
+            <button onclick="elegirPlan('Cine')" class="bg-blue-100 hover:bg-blue-200 text-blue-700 font-bold py-4 px-6 rounded-2xl shadow transition transform hover:scale-105 active:scale-95 text-xl flex items-center justify-center gap-3">🍿 Ir al cine</button>
+            <button onclick="elegirPlan('Paseo')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-bold py-4 px-6 rounded-2xl shadow transition transform hover:scale-105 active:scale-95 text-xl flex items-center justify-center gap-3">🍦 Paseo y helado</button>
+        </div>
+    </div>
+
+    <!-- PANTALLA 3: ELECCIÓN DE CENA -->
+    <div id="pantalla-cena" class="hidden bg-white/90 backdrop-blur-sm p-8 md:p-12 rounded-3xl shadow-2xl text-center max-w-md w-[90%] relative z-20 border border-white/50 fade-in-up">
+        <h2 class="text-3xl md:text-4xl text-pink-600 mb-6 font-bold leading-tight font-sans">
+            ¡Cena romántica! 🍷<br>
+            <span class="text-2xl text-gray-700 mt-2 block">¿Qué se te antoja comer?</span>
+        </h2>
+        <div class="grid grid-cols-2 gap-4">
+            <button onclick="elegirComida('Sushi')" class="bg-orange-100 hover:bg-orange-200 text-orange-700 font-bold py-4 px-4 rounded-2xl shadow transition transform hover:scale-105 active:scale-95 text-lg flex flex-col items-center justify-center gap-2"><span class="text-4xl">🍣</span> Sushi</button>
+            <button onclick="elegirComida('Pastas')" class="bg-yellow-100 hover:bg-yellow-200 text-yellow-700 font-bold py-4 px-4 rounded-2xl shadow transition transform hover:scale-105 active:scale-95 text-lg flex flex-col items-center justify-center gap-2"><span class="text-4xl">🍝</span> Pastas</button>
+            <button onclick="elegirComida('Hamburguesas')" class="bg-amber-100 hover:bg-amber-200 text-amber-700 font-bold py-4 px-4 rounded-2xl shadow transition transform hover:scale-105 active:scale-95 text-lg flex flex-col items-center justify-center gap-2"><span class="text-4xl">🍔</span> Burgers</button>
+            <button onclick="elegirComida('Sorpresa')" class="bg-purple-100 hover:bg-purple-200 text-purple-700 font-bold py-4 px-4 rounded-2xl shadow transition transform hover:scale-105 active:scale-95 text-lg flex flex-col items-center justify-center gap-2"><span class="text-4xl">✨</span> Sorpresa</button>
+        </div>
+        <button onclick="volverAPlanes()" class="mt-6 text-gray-500 underline hover:text-gray-700 transition">Volver a los planes</button>
+    </div>
+
+    <!-- Pantalla de Éxito (oculta inicialmente) -->
+    <div id="pantalla-exito" class="hidden absolute inset-0 bg-pink-500 flex items-center justify-center flex-col text-white z-50 p-6 text-center">
+        <h1 class="text-5xl md:text-7xl mb-6">¡Plan Confirmado!</h1>
+        <div class="text-8xl corazon mb-8">💖</div>
+        <p id="texto-final" class="text-2xl md:text-3xl font-semibold bg-white/20 p-6 rounded-2xl backdrop-blur-md shadow-lg leading-relaxed mb-8">
+            <!-- El texto se inyecta por JS -->
+        </p>
+        
+        <!-- Botón de WhatsApp agregado aquí -->
+        <a id="btn-whatsapp" href="#" target="_blank" class="bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-8 rounded-full shadow-lg transform transition hover:scale-105 active:scale-95 flex items-center gap-3 text-xl mt-4">
+            <span class="text-3xl">📱</span> ¡Avisarle por WhatsApp!
+        </a>
+    </div>
+
+    <script>
+        // Referencias a los elementos del DOM
+        const btnSi = document.getElementById('btn-si');
+        const btnNo = document.getElementById('btn-no');
+        const tarjetaPrincipal = document.getElementById('tarjeta-principal');
+        const pantallaPlanes = document.getElementById('pantalla-planes');
+        const pantallaCena = document.getElementById('pantalla-cena');
+        const pantallaExito = document.getElementById('pantalla-exito');
+        const contenedorBotones = document.getElementById('contenedor-botones');
+        const textoFinal = document.getElementById('texto-final');
+
+        // Variables de estado para el botón 'No'
+        let escalaBotonesNo = 1;
+        let intentos = 0;
+
+        // Función para mover el botón 'No' de forma aleatoria
+        function huirBoton() {
+            // Aumentar contador de intentos
+            intentos++;
+
+            // Reducir tamaño del botón progresivamente
+            if (escalaBotonesNo > 0.3) {
+                escalaBotonesNo -= 0.1;
+                btnNo.style.transform = `scale(${escalaBotonesNo})`;
+            }
+
+            // Cambiar textos divertidos si insiste
+            if (intentos === 3) btnNo.innerText = "¿Segura?";
+            if (intentos === 5) btnNo.innerText = "Dale, pensalo";
+            if (intentos === 7) btnNo.innerText = "Te conviene";
+            if (intentos > 9) btnNo.innerText = "Casi";
+
+            // Obtener dimensiones de la ventana y del botón
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+            const btnWidth = btnNo.offsetWidth * escalaBotonesNo;
+            const btnHeight = btnNo.offsetHeight * escalaBotonesNo;
+
+            // Mantener el botón dentro del contenedor de botones primero, o escapar por la pantalla si insiste mucho
+            let maxX, maxY, newX, newY;
+
+            if(intentos < 5) {
+                // Al principio se mueve cerca
+                const rectContenedor = contenedorBotones.getBoundingClientRect();
+                maxX = rectContenedor.width - btnWidth;
+                maxY = rectContenedor.height - btnHeight;
+                
+                // Coordenadas relativas al contenedor
+                newX = Math.random() * maxX;
+                newY = Math.random() * maxY;
+                
+                btnNo.style.left = `${newX}px`;
+                // Usamos margin top o bottom en lugar de top absolute para que no se superponga con el SI en el flujo flex
+                btnNo.style.top = `${Math.random() > 0.5 ? 20 : -20}px`; 
+
+            } else {
+                // Luego se vuelve loco por toda la pantalla
+                // Posicionamiento fixed para moverse por toda la pantalla
+                btnNo.style.position = 'fixed';
+                maxX = windowWidth - btnWidth;
+                maxY = windowHeight - btnHeight;
+
+                // Generar nuevas coordenadas aleatorias dentro de la pantalla
+                newX = Math.max(10, Math.floor(Math.random() * maxX));
+                newY = Math.max(10, Math.floor(Math.random() * maxY));
+
+                btnNo.style.left = `${newX}px`;
+                btnNo.style.top = `${newY}px`;
+                btnNo.style.bottom = 'auto'; // Resetear bottom
+                btnNo.style.right = 'auto';  // Resetear right
+            }
+        }
+
+        // Eventos para el botón 'No' (Mouseover para PC, Touchstart para móvil)
+        btnNo.addEventListener('mouseover', huirBoton);
+        btnNo.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Evita que simule un click
+            huirBoton();
+        });
+
+        // Asegurarse de que el NO empiece relativo al SÍ
+        window.addEventListener('load', () => {
+            // Inicializar la posición relativa al centro
+             btnNo.style.left = "calc(50% + 20px)";
+        });
+
+        // Evento para el botón 'Sí'
+        btnSi.addEventListener('click', () => {
+            // Ocultar tarjeta principal
+            tarjetaPrincipal.classList.add('hidden');
+            // Mostrar pantalla de planes
+            pantallaPlanes.classList.remove('hidden');
+        });
+
+        // Lógica de navegación de planes
+        let eleccionPlan = "";
+
+        function elegirPlan(plan) {
+            eleccionPlan = plan;
+            pantallaPlanes.classList.add('hidden');
+
+            if (plan === 'Cena') {
+                pantallaCena.classList.remove('hidden');
+            } else {
+                mostrarExito();
+            }
+        }
+
+        function elegirComida(comida) {
+            eleccionPlan = `Cena (${comida})`;
+            pantallaCena.classList.add('hidden');
+            mostrarExito();
+        }
+
+        function volverAPlanes() {
+            pantallaCena.classList.add('hidden');
+            pantallaPlanes.classList.remove('hidden');
+        }
+
+        function mostrarExito() {
+            pantallaExito.classList.remove('hidden');
+            pantallaExito.classList.add('flex'); // Asegurar layout flex
+            
+            // Personalizar el mensaje final según lo elegido
+            let mensajePantalla = "";
+            let mensajeWhatsApp = ""; // Nuevo mensaje para WhatsApp
+
+            if (eleccionPlan === 'Cine') {
+                mensajePantalla = "¡Nos vamos al cine! 🍿🎬<br><br><span class='text-xl opacity-90'>Alista las palomitas. ¡Te amo!</span>";
+                mensajeWhatsApp = "¡Hola mi amor! 🥰 Obvio que quiero salir contigo hoy. Elijo ir al cine 🍿🎬. ¡Te amo!";
+            } else if (eleccionPlan === 'Paseo') {
+                mensajePantalla = "¡Qué rico, helado y paseo! 🍦🚶‍♀️<br><br><span class='text-xl opacity-90'>Preparate para caminar de la mano. ¡Te amo!</span>";
+                mensajeWhatsApp = "¡Hola mi amor! 🥰 Obvio que quiero salir contigo hoy. Elijo el paseo con helado 🍦🚶‍♀️. ¡Te amo!";
+            } else if (eleccionPlan.includes('Cena')) {
+                const comida = eleccionPlan.split('(')[1].replace(')', '');
+                if (comida === 'Sorpresa') {
+                    mensajePantalla = "¡Una cena sorpresa para mi amor! ✨🍽️<br><br><span class='text-xl opacity-90'>Prepárate a las 20:00 hs.<br>¡Te amo!</span>";
+                    mensajeWhatsApp = "¡Hola mi amor! 🥰 Obvio que quiero salir contigo hoy. Elijo la cena romántica, ¡sorpréndeme! ✨🍽️. ¡Te amo!";
+                } else {
+                    mensajePantalla = `¡Excelente elección! Hoy se come ${comida} 😋<br><br><span class='text-xl opacity-90'>Prepárate a las 20:00 hs.<br>¡Te amo!</span>`;
+                    mensajeWhatsApp = `¡Hola mi amor! 🥰 Obvio que quiero salir contigo hoy. Elijo la cena romántica y quiero comer ${comida} 😋🍽️. ¡Te amo!`;
+                }
+            }
+            textoFinal.innerHTML = mensajePantalla;
+
+            // Configurar el botón de WhatsApp
+            // IMPORTANTE: Reemplaza PON_TU_NUMERO_AQUI por tu número con código de país (ej. 59899123456 para Uruguay)
+            const tuNumero = "59899548688"; 
+            const urlWhatsApp = `https://wa.me/${tuNumero}?text=${encodeURIComponent(mensajeWhatsApp)}`;
+            document.getElementById('btn-whatsapp').href = urlWhatsApp;
+
+            // Lanzar confeti
+            lanzarConfeti();
+        }
+
+        // Función para crear efecto de confeti
+        function lanzarConfeti() {
+            const colores = ['#ff0a54', '#ff477e', '#ff7096', '#ff85a1', '#fbb1bd', '#f9bec7', '#ffffff'];
+            
+            for (let i = 0; i < 150; i++) {
+                setTimeout(() => {
+                    const confeti = document.createElement('div');
+                    confeti.classList.add('confeti');
+                    
+                    // Posición y estilo aleatorio
+                    confeti.style.left = Math.random() * 100 + 'vw';
+                    confeti.style.backgroundColor = colores[Math.floor(Math.random() * colores.length)];
+                    confeti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                    
+                    // Diferentes formas
+                    if (Math.random() > 0.5) {
+                        confeti.style.borderRadius = '50%';
+                    }
+                    
+                    document.body.appendChild(confeti);
+                    
+                    // Limpiar DOM después de la animación
+                    setTimeout(() => {
+                        confeti.remove();
+                    }, 5000);
+                }, i * 20); // Retraso escalonado para un flujo continuo
+            }
+        }
+    </script>
+</body>
+</html>
